@@ -4,6 +4,13 @@
 # Wing IDE project file                                          #
 ##################################################################
 [project attributes]
+proj.directory-list = [{'dirloc': loc('.'),
+                        'excludes': [u'.gitattributes',
+                                     u'.gitignore'],
+                        'filter': '*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True}]
 proj.file-list = [loc('day2.py'),
                   loc('day3.py'),
                   loc('day4.py')]
