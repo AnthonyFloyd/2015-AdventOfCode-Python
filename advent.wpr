@@ -1,0 +1,10 @@
+#!wing
+#!version=5.0
+##################################################################
+# Wing IDE project file                                          #
+##################################################################
+[project attributes]
+proj.file-list = [loc('day2.py'),
+                  loc('day3.py'),
+                  loc('day4.py')]
+proj.file-type = 'shared'
