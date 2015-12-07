@@ -359,16 +359,16 @@ as RSHIFT 2 -> at
 # Build a parser, I guess
 #
 
-def evaluateInstruction(instruction, circuit):
+def evaluateInstruction(instruction, circuit, debug=False):
     #
     # instructions are either value -> lineIdOut
     # or
-    # lineIdIn1 OP lineIdIn2 -> lineIdOut
+    # [value1 | lineIdIn] OP [value2 | lineIdIn2] -> lineIdOut
+    #
+    # Always better to ask forgiveness than permission...
     #
     
     defer = False
-    
-    assert isinstance(instruction, str)
     
     firstPart, lineIdOut = instruction.split(' -> ')
     
@@ -428,80 +428,100 @@ def evaluateInstruction(instruction, circuit):
                     else:
                         raise RuntimeError('Unknown operator')
     if value is None:
-        #print('Deferring: "{0}"'.format(instruction))
+        # Couldn't find the value, defer the instruction 
+        if debug: print('Deferring: "{0}"'.format(instruction))
         return False
     elif value < 0:
+        # deal with underflow, set the line value
         circuit[lineIdOut] = 65536 + value
     elif value > 65535:
+        # deal with overflow, set the line value
         circuit[lineIdOut] = value - 65536
-        print('Overflow')
+        if debug: print('Overflow')
     else:
+        # Huzzah! Found the value, set the line
         circuit[lineIdOut] = value
     
-    print('"{2}": Assigned {0:d} to {1}'.format(circuit[lineIdOut], lineIdOut, instruction))
+    if debug: print('"{2}": Assigned {0:d} to {1}'.format(circuit[lineIdOut], lineIdOut, instruction))
     
     return True
     
-    
-if __name__=='__main__':
-    
-    instructions = part1Example.splitlines()
-    
-    circuit = {}
+def buildCircuit(circuit, instructions, debug=False):
+    #
+    # Loop through the pool of instructions 
+    # putting deferred instructions back into the pool
+    # until the pool is empty or we can't do anything
+    # more
+    #
+    counter = 0
+    complete = True
     
     while len(instructions) > 0:
         instruction = instructions.pop(0)
         success = evaluateInstruction(instruction, circuit)
         if not success:
-            instructions.append(instruction)
+            instructions.append(instruction) 
+            counter += 1
+        else:
+            counter = 0
+            if debug: print("Pool size: {0:d}".format(len(instructions)))
+            
+        if counter > len(instructions):
+            if debug: print("Unable to complete all instructions.")
+            complete = False
+            break        
         
+    return complete
+
+if __name__=='__main__':
+    
+    #
+    # Part 1 Example
+    #
+    
+    instructions = part1Example.splitlines()
+    circuit = {}
+    
+    print("Building test circuit from {0:d} instructions.".format(len(instructions)))
+    buildCircuit(circuit, instructions)
+    
+    # Print example instructions results    
     results = sorted(circuit.items())
     
     print("The values on the test lines are:")
     for item in results:
-        print('{0}:{1:d}'.format(item[0],item[1]))
+        print('   {0}:{1:d}'.format(item[0],item[1]))
         
-    circuit = {}
+    #
+    # Part 1 actual 
+    #
+    
     instructions = part1Instructions.splitlines()
-    
-    print("Parsing {0:d} instructions.".format(len(instructions)))
-    
-    counter = 0
-    while len(instructions) > 0:
-      
-        instruction = instructions.pop(0)
-        success = evaluateInstruction(instruction, circuit)
-        if not success:
-            instructions.append(instruction) 
-            counter += 1
-        else:
-            counter = 0
-            #print("Pool size: {0:d}".format(len(instructions)))
-            
-        if counter > len(instructions):
-            break
-    
-    print("The value on line a is: {0:d}".format(circuit.get('a',0)))
-    
-    # Now, plug b into the circuit after resetting
-    b = circuit.get('a',0)
     circuit = {}
-    circuit['b'] = b
-    instructions = part1Instructions.splitlines()
     
-    counter = 0
-    while len(instructions) > 0:
-      
-        instruction = instructions.pop(0)
-        success = evaluateInstruction(instruction, circuit)
-        if not success:
-            instructions.append(instruction) 
-            counter += 1
-        else:
-            counter = 0
-            #print("Pool size: {0:d}".format(len(instructions)))
-            
-        if counter > len(instructions):
-            break
+    print("\nBuilding part 1 circuit from {0:d} instructions.".format(len(instructions)))
+    buildCircuit(circuit, instructions)
     
-    print("The value on line a is: {0:d}".format(circuit.get('a',0)))    
+    # Print part 1 result
+    print("The value on line 'a' is: {0:d}\n".format(circuit.get('a',0)))
+    
+    #
+    # Part 2 actual
+    #
+    
+    # Preset line 'b' with part 1's value for a, then reset circuit
+    
+    b = circuit.get('a', False)
+    
+    if b:
+        instructions = part1Instructions.splitlines()
+        circuit = {}
+        circuit['b'] = b
+        
+        print("Building part 2 circuit from {0:d} instructions.".format(len(instructions)))
+        buildCircuit(circuit, instructions)
+        
+        # print part 2 result
+        print("The value on line 'a' is: {0:d}".format(circuit.get('a',0)))    
+    else:
+        print("Couldn't evaluate part 2, since line 'a' doesn't have a valid value from part 1.")
