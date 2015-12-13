@@ -5,13 +5,13 @@
 ##################################################################
 [project attributes]
 proj.directory-list = [{'dirloc': loc('.'),
-                        'excludes': [u'.gitattributes',
+                        'excludes': [u'day2.py',
+                                     u'day4.py',
+                                     u'.gitattributes',
+                                     u'day3.py',
                                      u'.gitignore'],
                         'filter': '*',
                         'include_hidden': False,
                         'recursive': True,
                         'watch_for_changes': True}]
-proj.file-list = [loc('day2.py'),
-                  loc('day3.py'),
-                  loc('day4.py')]
 proj.file-type = 'shared'
