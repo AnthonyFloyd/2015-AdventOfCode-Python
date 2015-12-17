@@ -541,25 +541,81 @@ def parseSues(suesList):
             
     return sues
 
-def findSue(sues,children=0, cats=0, samoyeds=0, 
-            pomeranians=0, akitas=0, vizslas=0, goldfish=0,
-            trees=0, cars=0, perfumes=0):
+def findSue(sues,children=None, cats=None, samoyeds=None, 
+            pomeranians=None, akitas=None, vizslas=None, goldfish=None,
+            trees=None, cars=None, perfumes=None):
     
     foundSue = None
     
     for sue in sues:
-        if sue.children == children:
+        match = False
+        
+        if children is not None:
+            if sue.children == children:
+                match = True
+            else:
+                match = False
+                
+                
+        if cats is not None:
             if sue.cats == cats:
-                if sue.samoyeds == samoyeds:
-                    if sue.pomeranians == pomeranians:
-                        if sue.akitas == akitas:
-                            if sue.vizslas == vizslas:
-                                if sue.goldfish == goldfish:
-                                    if sue.trees == trees:
-                                        if sue.cars == cars:
-                                            if sue.perfumes == perfumes:
-                                                foundSue = sue
-                                                break
+                match = match and True
+            else:
+                match = False
+                
+        if samoyeds is not None:
+            if sue.samoyeds == samoyeds:
+                match = match and True
+            else:
+                match = False
+                
+        if pomeranians is not None:
+            if sue.pomeranians == pomeranians:
+                match = match and True
+            else:
+                match = False
+                
+        if akitas is not None:
+            if sue.akitas == akitas:
+                match = match and True
+            else:
+                match = False
+                
+        if vizslas is not None:
+            if sue.vizslas == vizslas:
+                match = match and True
+            else:
+                match = False
+                
+        if goldfish is not None:
+            if sue.goldfish == goldfish:
+                match = match and True
+            else:
+                match = False
+                
+        if trees is not None:
+            if sue.trees == trees:
+                match = match and True
+            else:
+                match = False
+                
+        if cars is not None:
+            if sue.cars == cars:
+                match = match and True
+            else:
+                match = False
+                
+        if perfumes is not None:
+            if sue.perfumes == perfumes:
+                match = match and True
+            else:
+                match = False
+                
+        if match:
+            foundSue = sue
+            print("{0:d} {1:d} {2:d} {3:d} {4:d} {5:d} {6:d} {7:d}".format(sue.children, sue.cats, sue.samoyeds, sue.pomeranians, sue.goldfish, sue.trees, sue.cars, sue.perfumes))
+            print("{0:d} {1:d} {2:d} {3:d} {4:d} {5:d} {6:d} {7:d}".format(children, cats, samoyeds, pomeranians, goldfish, trees, cars, perfumes))
+            break
                                             
         
     return foundSue
