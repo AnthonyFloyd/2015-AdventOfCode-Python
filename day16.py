@@ -505,11 +505,22 @@ Sue 500: cars: 1, perfumes: 6, vizslas: 1
 '''
 
 suesList = day16Sues.splitlines()
+things = ['children',
+          'cats',
+          'samoyeds',
+          'pomeranians',
+          'akitas',
+          'vizslas',
+          'goldfish',
+          'trees',
+          'cars',
+          'perfumes',
+          ]
 
 class Sue(object):
-    def __init__(self, id, children=0, cats=0, samoyeds=0, 
-                 pomeranians=0, akitas=0, vizslas=0, goldfish=0,
-                 trees=0, cars=0, perfumes=0):
+    def __init__(self, id, children=None, cats=None, samoyeds=None, 
+                 pomeranians=None, akitas=None, vizslas=None, goldfish=None,
+                 trees=None, cars=None, perfumes=None):
         self.id = id
         self.children = children
         self.cats = cats
@@ -541,95 +552,63 @@ def parseSues(suesList):
             
     return sues
 
-def findSue(sues,children=None, cats=None, samoyeds=None, 
-            pomeranians=None, akitas=None, vizslas=None, goldfish=None,
-            trees=None, cars=None, perfumes=None):
+def findSue(sues,children=0, cats=0, samoyeds=0, 
+            pomeranians=0, akitas=0, vizslas=0, goldfish=0,
+            trees=0, cars=0, perfumes=0, part2=False):
     
     foundSue = None
     
-    for sue in sues:
-        match = False
+    for sue in sues:    
+        foundSue = True
         
-        if children is not None:
-            if sue.children == children:
-                match = True
-            else:
-                match = False
-                
-                
-        if cats is not None:
-            if sue.cats == cats:
-                match = match and True
-            else:
-                match = False
-                
-        if samoyeds is not None:
-            if sue.samoyeds == samoyeds:
-                match = match and True
-            else:
-                match = False
-                
-        if pomeranians is not None:
-            if sue.pomeranians == pomeranians:
-                match = match and True
-            else:
-                match = False
-                
-        if akitas is not None:
-            if sue.akitas == akitas:
-                match = match and True
-            else:
-                match = False
-                
-        if vizslas is not None:
-            if sue.vizslas == vizslas:
-                match = match and True
-            else:
-                match = False
-                
-        if goldfish is not None:
-            if sue.goldfish == goldfish:
-                match = match and True
-            else:
-                match = False
-                
-        if trees is not None:
-            if sue.trees == trees:
-                match = match and True
-            else:
-                match = False
-                
-        if cars is not None:
-            if sue.cars == cars:
-                match = match and True
-            else:
-                match = False
-                
-        if perfumes is not None:
-            if sue.perfumes == perfumes:
-                match = match and True
-            else:
-                match = False
-                
-        if match:
-            foundSue = sue
-            print("{0:d} {1:d} {2:d} {3:d} {4:d} {5:d} {6:d} {7:d}".format(sue.children, sue.cats, sue.samoyeds, sue.pomeranians, sue.goldfish, sue.trees, sue.cars, sue.perfumes))
-            print("{0:d} {1:d} {2:d} {3:d} {4:d} {5:d} {6:d} {7:d}".format(children, cats, samoyeds, pomeranians, goldfish, trees, cars, perfumes))
+        for thing in things:
+            if eval(thing) is not None:
+                if getattr(sue, thing) is not None:
+                    if part2 and thing in ['cats', 'trees']:
+                        if getattr(sue, thing) <= eval(thing):
+                            #print("Sue {0:d}, {1} > {2:d} !> {3:d}".format(sue.id, thing, getattr(sue, thing), eval(thing)))
+                            foundSue = False
+                            break                            
+                    elif part2 and thing in ['pomeranians', 'goldfish']:
+                        if getattr(sue, thing) >= eval(thing):
+                            #print("Sue {0:d}, {1} < {2:d} !> {3:d}".format(sue.id, thing, getattr(sue, thing), eval(thing)))
+                            foundSue = False
+                            break                            
+                    else:
+                        if getattr(sue, thing) != eval(thing):
+                            #print("Sue {0:d}, {1} = {2:d} != {3:d}".format(sue.id, thing, getattr(sue, thing), eval(thing)))
+                            foundSue = False
+                            break
+                               
+        if foundSue:
+            print("Found Sue!")
+            print("She's #{0:d}".format(sue.id))
+            print("She has:")
+            for thing in things:
+                if getattr(sue, thing) != None:
+                    print(" {0:d} {1}".format(getattr(sue,thing), thing))
             break
-                                            
         
-    return foundSue
+    if foundSue: 
+        return sue
+    else:
+        return None
         
         
 if __name__ == '__main__':
     
     sues = parseSues(suesList)
     
+    print("Part 1:")
     foundSue = findSue(sues, children=3, cats=7, samoyeds=2, pomeranians=3, goldfish=5, 
                       trees=3, cars=2, perfumes=1)
+
+    print("\nPart 2:")
+    foundSue = findSue(sues, children=3, cats=7, samoyeds=2, pomeranians=3, goldfish=5, 
+                      trees=3, cars=2, perfumes=1, part2=True)
     
-    if foundSue:
-        print("Found Sue! She's {0:d}".format(foundSue.id))
-    else:
-        print("Found no Sue :(")
+    #if foundSue:
+        #print("Found Sue! She's {0:d}".format(foundSue.id))
+    #else:
+        #print("Found no Sue :(")
     
