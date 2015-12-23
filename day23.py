@@ -70,8 +70,7 @@ def execute(instructions, registerA=0, registerB=0, verbose=False):
         
         # parse line, break into instruction, register, and jump (if needed)
         
-        instructionLine = instructions[lineCounter].replace(',','')
-        instructionBits = instructionLine.split(' ')
+        instructionBits = instructions[lineCounter].replace(',','').split(' ')
         
         if len(instructionBits) == 2:
             instruction, register = instructionBits
@@ -105,9 +104,12 @@ def execute(instructions, registerA=0, registerB=0, verbose=False):
         elif instructionBits[0] == 'hlf': # half register
             registers[register] //= 2
             
-        if verbose: print("{0:d} {1} (a: {2:d}, b: {3:d})".format(lineCounter, instructionLine, registers['a'], registers['b']))
+        if verbose: print("{0:2d} {1:12} (a: {2:d}, b: {3:d})".format(lineCounter, instructions[lineCounter], registers['a'], registers['b']))
         lineCounter += lineIncrement
-            
+    
+    if verbose: print("")
+    print("Program output")
+    print("==============")
     print("Register A: {0:d}".format(registers['a']))
     print("Register B: {0:d}".format(registers['b']))
                     
@@ -117,12 +119,17 @@ if __name__ == '__main__':
     testInstructions = testProgram.splitlines()
     part1Instructions = part1Program.splitlines()
     
-    print("Test instructions")
-    execute(testInstructions)
+    verbose = False
+    
+    print("Test program")
+    print("------------\n")
+    execute(testInstructions, verbose=verbose)
     print("\nPart 1")
-    execute(part1Instructions)
+    print("------\n")
+    execute(part1Instructions, verbose=verbose)
     print("\nPart 2")
-    execute(part1Instructions, registerA=1) 
+    print("------\n")
+    execute(part1Instructions, registerA=1, verbose=verbose) 
 
 
     
