@@ -63,77 +63,53 @@ jmp -7
 
 
 def execute(instructions, registerA=0, registerB=0, verbose=False):
-    registerA = registerA
-    registerB = registerB
-    
-    running = True
+    registers={'a':registerA, 'b':registerB}
     lineCounter = 0
     
-    while running:
-        instruction = instructions[lineCounter]
-        if verbose:
-            print("{0:d} {1}".format(lineCounter,
-                                     instruction))
+    while lineCounter >= 0 and lineCounter < len(instructions):
         
-        assert isinstance(instruction, str)
-    
-        instruction = instruction.replace(',','')
-        instructionBits = instruction.split(' ')
+        # parse line, break into instruction, register, and jump (if needed)
         
-        if len(instructionBits) == 3:
-            # a conditional jump instruction
-            if instructionBits[0] == 'jio': # jump if "1"
-                if instructionBits[1] == 'a':
-                    if registerA == 1:
-                        lineCounter += int(instructionBits[2])
-                    else:
-                        lineCounter += 1
-                else:
-                    if registerB == 1:
-                        lineCounter += int(instructionBits[2])
-                    else:
-                        lineCounter += 1
-            elif instructionBits[0] == 'jie': #jump if even
-                if instructionBits[1] == 'a':
-                    if registerA % 2 == 0:
-                        lineCounter += int(instructionBits[2])
-                    else:
-                        lineCounter += 1
-                else:
-                    if registerB % 2 == 0:
-                        lineCounter += int(instructionBits[2])
-                    else:
-                        lineCounter += 1
+        instructionLine = instructions[lineCounter].replace(',','')
+        instructionBits = instructionLine.split(' ')
+        
+        if len(instructionBits) == 2:
+            instruction, register = instructionBits
+            jump = register # take care of jmp without register
+        elif len(instructionBits) == 3:
+            instruction, register, jump = instructionBits
         else:
-            if instructionBits[0] == 'jmp': # unconditional jump
-                lineCounter += int(instructionBits[1])
-            elif instructionBits[0] == 'inc': # increment register
-                if instructionBits[1] == 'a':
-                    registerA += 1
-                    lineCounter += 1
-                else:
-                    registerB += 1
-                    lineCounter += 1
-            elif instructionBits[0] == 'tpl': # triple register
-                if instructionBits[1] == 'a':
-                    registerA = registerA * 3
-                    lineCounter += 1
-                else:
-                    registerB = registerB * 3
-                    lineCounter += 1
-            elif instructionBits[0] == 'hlf': # half register
-                if instructionBits[1] == 'a':
-                    registerA = registerA // 2
-                    lineCounter += 1
-                else:
-                    registerB = registerB // 2
-                    lineCounter += 1
-                    
-        if lineCounter >= len(instructions):
-            running = False
+            raise RuntimeError("Unknown instruction!")
             
-    print("Register A: {0:d}".format(registerA))
-    print("Register B: {0:d}".format(registerB))
+        # every instruction advances to the next line, except jumps which advance more
+        lineIncrement = 1
+        
+        # execute appropriate instruction
+        if instruction == 'jio': # jump if "1"
+            if registers[register] == 1:
+                lineIncrement = int(jump)
+                
+        elif instruction == 'jie': #jump if even
+            if registers[register] % 2 == 0:
+                lineIncrement = int(jump)
+
+        elif instruction == 'jmp': # unconditional jump
+            lineIncrement = int(jump) 
+            
+        elif instruction == 'inc': # increment register
+            registers[register] += 1
+            
+        elif instruction == 'tpl': # triple register
+            registers[register] *= 3
+
+        elif instructionBits[0] == 'hlf': # half register
+            registers[register] //= 2
+            
+        if verbose: print("{0:d} {1} (a: {2:d}, b: {3:d})".format(lineCounter, instructionLine, registers['a'], registers['b']))
+        lineCounter += lineIncrement
+            
+    print("Register A: {0:d}".format(registers['a']))
+    print("Register B: {0:d}".format(registers['b']))
                     
                     
 if __name__ == '__main__':                
@@ -146,7 +122,7 @@ if __name__ == '__main__':
     print("\nPart 1")
     execute(part1Instructions)
     print("\nPart 2")
-    execute(part1Instructions, registerA=1) #255 too low
+    execute(part1Instructions, registerA=1) 
 
 
     
